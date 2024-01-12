@@ -55,6 +55,7 @@ async def create_user(user: User):
     return {"id": doc.id, **user.dict()}
 
 
+# For admin
 @app.put("/users/{user_id}")
 async def edit_user(user_id: str, user: User):
     doc = db.collection("users").document(user_id).get()
@@ -64,6 +65,7 @@ async def edit_user(user_id: str, user: User):
     return {"message": "User not found"}
 
 
+# For admin
 @app.delete("/users/{user_id}")
 async def delete_user(user_id: str):
     doc = db.collection("users").document(user_id).get()
