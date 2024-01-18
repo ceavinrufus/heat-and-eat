@@ -16,7 +16,7 @@ export default function ProductDetails() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response_item = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/items/${router.query.name}`, {
+        const response_item = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/items/${name}`, {
           method: "GET",
           headers: JSON.parse(process.env.NEXT_PUBLIC_HEADER),
         });
@@ -37,7 +37,7 @@ export default function ProductDetails() {
           const data_shop = await response_shop.json();
           setShop(data_shop);
 
-          const response_reviews = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/items/${router.query.name}/reviews`, {
+          const response_reviews = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/items/${name}/reviews`, {
             method: "GET",
             headers: JSON.parse(process.env.NEXT_PUBLIC_HEADER),
           });
@@ -108,7 +108,7 @@ export default function ProductDetails() {
                 </div>
               </div>
               <div className="absolute bottom-0 w-full z-10">
-                <CheckoutBar />
+                <CheckoutBar item_id={item.id} name={item.name} price={item.price} calorie={item.calorie}/>
               </div>
             </div>
           </div>
