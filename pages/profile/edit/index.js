@@ -1,8 +1,6 @@
 import Head from "next/head";
 import Header from "../../../components/Header";
 import { IoChevronBackOutline } from "react-icons/io5";
-import { IoChevronForwardCircleOutline } from "react-icons/io5";
-import { IoPencil } from "react-icons/io5";
 import Button from "../../../components/Button";
 
 export default function EditProfile() {
