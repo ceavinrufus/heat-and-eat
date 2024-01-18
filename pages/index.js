@@ -1,14 +1,16 @@
 import Head from "next/head";
-import Header from "../components/Header";
-import { IoChevronBackOutline } from "react-icons/io5";
-import { IoChevronForwardCircleOutline } from "react-icons/io5";
-import { IoPencil } from "react-icons/io5";
-import Button from "../components/Button";
 import { FaUserLarge } from "react-icons/fa6";
 import { IoIosSearch } from "react-icons/io";
 import { IoNotifications } from "react-icons/io5";
 import HeaPayPill from "../components/HeaPayPill";
 import MenuCard from "../components/MenuCard";
+import Navbar from "../components/Navbar";
+import { Swiper, SwiperSlide } from "swiper/react";
+
+import "swiper/css";
+import "swiper/css/scrollbar";
+
+import { Scrollbar } from "swiper/modules";
 
 export default function Home() {
   return (
@@ -21,7 +23,7 @@ export default function Home() {
 
       <main className="">
         <div className="flex justify-center">
-          <div className="w-[360px] bg-white h-screen relative">
+          <div className="w-[360px] bg-white min-h-screen relative">
             <div className="absolute flex items-center w-full justify-between text-xl p-3 mb-8 gap-2">
               <div className="flex items-center flex-grow rounded-full gap-2 bg-[#F3F2F0] text-base px-2 py-1 text-[#949494]">
                 <IoIosSearch />
@@ -44,19 +46,54 @@ export default function Home() {
             <div className="-translate-y-8">
               <HeaPayPill />
             </div>
-            <div className="mx-7">
+            <div className="mx-7 mb-6">
               <h2 className="font-bold text-xl mb-4">{`Today's Menu Recommendation!`}</h2>
-              <div className="flex gap-2">
-                <MenuCard />
-                <MenuCard />
-                <MenuCard />
-              </div>
+              <Swiper
+                scrollbar={{
+                  hide: true,
+                }}
+                slidesPerView={2.3}
+                modules={[Scrollbar]}
+                className="mySwiper"
+              >
+                <SwiperSlide>
+                  <MenuCard />
+                </SwiperSlide>
+                <SwiperSlide>
+                  <MenuCard />
+                </SwiperSlide>
+                <SwiperSlide>
+                  <MenuCard />
+                </SwiperSlide>
+              </Swiper>
+            </div>
+            <div className="mx-7 mb-6">
+              <h2 className="font-bold text-xl mb-4">{`New in Bandung!`}</h2>
+              <Swiper
+                scrollbar={{
+                  hide: true,
+                }}
+                slidesPerView={2.3}
+                modules={[Scrollbar]}
+                className="mySwiper"
+              >
+                <SwiperSlide>
+                  <MenuCard />
+                </SwiperSlide>
+                <SwiperSlide>
+                  <MenuCard />
+                </SwiperSlide>
+                <SwiperSlide>
+                  <MenuCard />
+                </SwiperSlide>
+              </Swiper>
+            </div>
+            <div className="sticky bottom-0 w-full z-10">
+              <Navbar selected={"Home"} />
             </div>
           </div>
         </div>
       </main>
-
-      <footer className=""></footer>
     </div>
   );
 }
