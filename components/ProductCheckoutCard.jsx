@@ -1,6 +1,16 @@
 import React, { useState } from "react";
+import Image from "next/image";
 
-function CheckoutBar() {
+const buttonStyle = {
+  padding: "0 0.5rem",
+  cursor: "pointer",
+  borderRadius: "4px",
+  border: "1px solid #ccc",
+  background: "#fff",
+  outline: "none",
+};
+
+function ProductCheckoutCard() {
   const [value, setValue] = useState(1);
 
   const handleIncrement = () => {
@@ -14,22 +24,27 @@ function CheckoutBar() {
     setValue(newValue);
     setValue(newValue);
   };
-
-  const buttonStyle = {
-    padding: "0.5rem",
-    fontSize: "1rem",
-    cursor: "pointer",
-    borderRadius: "4px",
-    border: "1px solid #ccc",
-    background: "#fff",
-    outline: "none",
-  };
-
   const isIncrementDisabled = value === 100;
   const isDecrementDisabled = value === 1;
+
   return (
-    <div className="flex justify-around items-center bg-white h-[80px] px-4 gap-4">
-      <div className="w-2/5">
+    <div className="flex justify-between items-center w-full gap-2">
+      <div className="relative w-1/4">
+        <Image
+          style={{ objectFit: "contain" }}
+          width={60}
+          height={60}
+          src="/salman.png"
+          alt=""
+          className=""
+        />
+      </div>
+      <div className="w-1/2">
+        <p className="text-xs">Salmon With Fried Rice</p>
+        <p className="text-[8px]">Calorie: 300 kcal</p>
+        <p className="text-xs font-bold">Rp50.000</p>
+      </div>
+      <div className="w-1/4">
         <div className="flex items-center">
           <button
             style={buttonStyle}
@@ -48,15 +63,8 @@ function CheckoutBar() {
           </button>
         </div>
       </div>
-      <div className="flex items-center justify-between w-3/5 bg-[#991E23] px-4 py-2 rounded-full text-white">
-        <div className="">
-          <p className="text-xs">Add to cart</p>
-          <p className="text-[8px]">300 kcal</p>
-        </div>
-        <p className="text-xs font-bold">Rp50.000</p>
-      </div>
     </div>
   );
 }
 
-export default CheckoutBar;
+export default ProductCheckoutCard;
