@@ -14,7 +14,6 @@ function ReviewCard({ review }: Review) {
   const [user, setUser] = useState({});
 
   useEffect(() => {
-    console.log(review)
     const fetchData = async () => {
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${review.user_id}`, {

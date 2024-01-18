@@ -1,10 +1,86 @@
+import {useState, useEffect} from "react";
 import Head from "next/head";
 import Header from "../../../components/Header";
-import { FaMapMarkerAlt } from "react-icons/fa";
-import { IoPencil } from "react-icons/io5";
 import FinalProductCheckoutCard from "../../../components/FinalProductCheckoutCard";
 
 export default function Checkout() {
+  const [address, setAddress] = useState({});
+  const [itemsId, setItemsId] = useState([]);
+  const [cart, setCart] = useState([])
+  const [totalPrice, setTotalPrice] = useState(0)
+  const [delivery, setDelivery] = useState(10000);
+  const [foodSubtotalDiscount, setFoodSubtotalDiscount] = useState(0);
+  const [paymentTotal, setPaymentTotal] = useState(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/addresses`, {
+          method: "GET",
+          headers: JSON.parse(process.env.NEXT_PUBLIC_HEADER),
+        });
+        if (!response.ok) {
+          console.error("Error fetching address:", response.status, response.statusText);
+        }
+        let data = await response.json();
+        await setAddress(data[0]);
+        
+        response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/cart`, {
+          method: "GET",
+          headers: JSON.parse(process.env.NEXT_PUBLIC_HEADER),
+        });
+        if (!response.ok) {
+          console.error("Error fetching data:", response.status, response.statusText);
+        }
+        data = (await response.json())["items_id"];
+        setItemsId(data);
+
+        const countMap = {};
+        data.forEach(item => {
+          countMap[item] = (countMap[item] || 0) + 1;
+        });
+        let _totalPrice = 0;
+        const mapped_cart = await Promise.all(Object.entries(countMap).map(async ([key, value]) => {
+          response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/items/${key}`, {
+            method: "GET",
+            headers: JSON.parse(process.env.NEXT_PUBLIC_HEADER),
+          })
+          data = await response.json();
+          _totalPrice += (data.price * value)
+          return [data, await value]
+        }));
+        setTotalPrice(_totalPrice)
+        setCart(mapped_cart)
+      } catch (error) {
+        console.error("Error fetching item or shop:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleCheckout = async () => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/orders`, {
+      method: "POST",
+      headers: {...JSON.parse(process.env.NEXT_PUBLIC_HEADER), "Content-Type": "application/json"},
+      body: JSON.stringify({
+        items_id: itemsId,
+        address_id: address.id,
+        price: totalPrice,
+        delivery: delivery,
+        food_subtotal_discount: foodSubtotalDiscount,
+        payment_total: paymentTotal,
+        points_earned: 0,
+        payment_method: "Heapay"
+      })
+    });
+    if (!response.ok) {
+      console.error("Error fetching data:", response.status, response.statusText);
+    } else {
+      window.alert("Berhasil checkout item")
+    }
+  }
+
   return (
     <div className="">
       <Head>
@@ -16,48 +92,50 @@ export default function Checkout() {
       <main className="">
         <div className="flex justify-center">
           <div className="w-[360px] bg-white h-screen relative">
-            <Header title={"Cart"} />
+            <Header title={"Cart"} backPath={"/cart"} />
             <div className="px-6 flex flex-col gap-4">
               {/* Alamat */}
               <div className="bg-[#F3F2F0] px-5 py-3 rounded-xl">
-                <p className="font-bold text-xs">Delvery Address</p>
-                <p className="text-xs mt-1">Dastin</p>
-                <p className="text-xs mt-1">(+62) 8123456789</p>
-                <p className="text-[10px] mt-1">
-                  Jl. Old Water Lake No. 11, Dago, Kec. Coblong COBLONG, KOTA
-                  BANDUNG, JAWA BARAT, 40135
-                </p>
+                <p className="font-bold text-xs">Delivery Address</p>
+                <p className="text-xs mt-1">{address?.name}</p>
+                <p className="text-xs mt-1">{address?.phone_number}</p>
+                <p className="text-[10px] mt-1">{address?.street_address} {address?.subdistrict} {address?.district}, {address?.city}, {address?.province}, {address?.postcode}</p>
               </div>
 
               {/* Info Produk */}
-              <div className="bg-[#F3F2F0] px-6 py-3 rounded-xl">
-                <FinalProductCheckoutCard />
+              {cart.map(([item, count], index) => (
+              <div key={index} className="bg-[#F3F2F0] px-6 py-3 rounded-xl">
+                <FinalProductCheckoutCard item={item} count={count}/>
               </div>
+                ))}
 
               <div className="divide-y-[1px] divide-black">
                 <h2 className="font-bold pb-2">Payment Details</h2>
                 <div className="pt-2">
                   <div className="flex justify-between">
                     <p className="text-xs">Price</p>
-                    <p className="text-xs">Rp50.000</p>
+                    <p className="text-xs">{totalPrice}</p>
                   </div>
                   <div className="flex justify-between">
                     <p className="text-xs">Delivery</p>
-                    <p className="text-xs">Rp10.000</p>
+                    <p className="text-xs">{delivery}</p>
                   </div>
                   <div className="flex justify-between">
                     <p className="text-xs">Food Subtotal Discount</p>
-                    <p className="text-xs">-Rp0</p>
+                    <p className="text-xs">-{foodSubtotalDiscount}</p>
                   </div>
                   <div className="flex font-bold justify-between">
                     <p className="text-xs">Payment Total</p>
-                    <p className="text-xs">Rp60.000</p>
+                    <p className="text-xs">{totalPrice + delivery - foodSubtotalDiscount}</p>
                   </div>
                 </div>
               </div>
             </div>
             <div className="absolute bottom-0 w-full px-6 py-3 z-10">
-              <button className="bg-[#991E23] py-1 text-white font-semibold rounded-full w-full">
+              <button
+              className="bg-[#991E23] py-1 text-white font-semibold rounded-full w-full"
+              onClick={handleCheckout}
+              >
                 Checkout
               </button>
             </div>

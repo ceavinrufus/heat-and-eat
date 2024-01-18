@@ -1,11 +1,75 @@
+
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import Header from "../../components/Header";
 import { FaMapMarkerAlt } from "react-icons/fa";
-import Button from "../../components/Button";
 import { IoPencil } from "react-icons/io5";
 import ProductCheckoutCard from "../../components/ProductCheckoutCard";
 
 export default function Cart() {
+  const [address, setAddress] = useState({});
+  const [cart, setCart] = useState({})
+  const [totalCalories, setTotalCalories] = useState(0)
+  const [totalPrice, setTotalPrice] = useState(0)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/addresses`, {
+          method: "GET",
+          headers: JSON.parse(process.env.NEXT_PUBLIC_HEADER),
+        });
+        if (!response.ok) {
+          console.error("Error fetching address:", response.status, response.statusText);
+        }
+        let data = await response.json();
+        await setAddress(data[0]);
+        
+        response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/cart`, {
+          method: "GET",
+          headers: JSON.parse(process.env.NEXT_PUBLIC_HEADER),
+        });
+        if (!response.ok) {
+          console.error("Error fetching data:", response.status, response.statusText);
+        }
+        data = (await response.json())["items_id"];
+
+        const countMap = {};
+        data.forEach(item => {
+          countMap[item] = (countMap[item] || 0) + 1;
+        });
+        let _totalPrice = 0, _totalCalories = 0;
+        const mapped_cart = await Promise.all(Object.entries(countMap).map(async ([key, value]) => {
+          response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/items/${key}`, {
+            method: "GET",
+            headers: JSON.parse(process.env.NEXT_PUBLIC_HEADER),
+          })
+          data = await response.json();
+          _totalPrice += (data.price * await value);
+          _totalCalories += (data.calorie * await value);
+          return [data, await value]
+        }));
+        setTotalPrice(_totalPrice)
+        setTotalCalories(_totalCalories)
+
+        const sorted_cart = mapped_cart.reduce((result, [item, count]) => {
+          if (result[item.shop_name]) {
+            result[item.shop_name].push([item, count]);
+          } else {
+            result[item.shop_name] = [[item, count]];
+          }
+          return result;
+        }, {});
+
+        setCart(sorted_cart)
+      } catch (error) {
+        console.error("Error fetching item or shop:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div className="">
       <Head>
@@ -18,7 +82,7 @@ export default function Cart() {
         <div className="flex justify-center">
           <div className="w-[360px] bg-white h-screen relative">
             <Header
-              backPath="/"
+              backPath="/menu"
               title={"Cart"}
             />
             <div className="divide-y-[1px] divide-black">
@@ -29,9 +93,7 @@ export default function Cart() {
                     <p className="text-xs">Delivery Address</p>
                     <div className="flex gap-2 items-start">
                       <p className="text-xs mt-1">
-                        Dastin | (+62) 8123456789 Jl. Old Water Lake No. 11,
-                        Dago, Kec. Coblong COBLONG, KOTA BANDUNG, JAWA BARAT,
-                        40135
+                        {address?.name} | {address?.phone_number} | {address?.street_address} {address?.subdistrict} {address?.district}, {address?.city}, {address?.province}, {address?.postcode}
                       </p>
                       <IoPencil className="text-[#C4C4C4] text-3xl" />
                     </div>
@@ -45,44 +107,31 @@ export default function Cart() {
                 </div>
               </div>
 
-              {/* Toko 1 */}
-              <div className="px-6 py-2 flex flex-col gap-3">
-                <div className="flex gap-2">
-                  <input type="checkbox" />
-                  <p className="text-xs font-bold">Toko Suka Majumundur</p>
-                </div>
-                <div className="">
+              {/* Toko Asli */}
+              {Object.entries(cart).map(([shop, items], index1) => (
+                <div key={index1} className="px-6 py-2 flex flex-col gap-3">
                   <div className="flex gap-2">
                     <input type="checkbox" />
-                    <ProductCheckoutCard />
+                    <p className="text-xs font-bold">{shop}</p>
                   </div>
+                  {items.map(([item, count], index2) => {
+                    return (
+                    <div key={index2} className="">
+                      <div className="flex gap-2">
+                        <input type="checkbox" />
+                        <ProductCheckoutCard item={item} count={count} />
+                      </div>
+                    </div>
+                  );
+                  })}
                 </div>
-                <div className="">
-                  <div className="flex gap-2">
-                    <input type="checkbox" />
-                    <ProductCheckoutCard />
-                  </div>
-                </div>
-              </div>
+              ))}
 
-              {/* Toko 2 */}
-              <div className="px-6 py-2 flex flex-col gap-3">
-                <div className="flex gap-2">
-                  <input type="checkbox" />
-                  <p className="text-xs font-bold">Toko Suka Majumundur</p>
-                </div>
-                <div className="">
-                  <div className="flex gap-2">
-                    <input type="checkbox" />
-                    <ProductCheckoutCard />
-                  </div>
-                </div>
-              </div>
             </div>
             <div className="absolute bottom-0 w-full z-10">
               <div className="px-6 h-[40px] flex items-center justify-between border-[1px] border-black">
                 <p className="text-xs">Calories:</p>
-                <p className="font-bold text-xs">0 cal</p>
+                <p className="font-bold text-xs">{totalCalories} cal</p>
               </div>
               <div className="px-6 h-[70px] flex items-center justify-between">
                 <div className="w-1/3">
@@ -92,7 +141,7 @@ export default function Cart() {
                       +15 Heapay Points
                     </p>
                   </div>
-                  <p className="text-xl text-[#991E23] font-bold">Rp150.000</p>
+                  <p className="text-xl text-[#991E23] font-bold">{totalPrice}</p>
                 </div>
                 <div className="flex">
                   <button className="text-base px-6 py-1 rounded-full text-white bg-[#991E23]">

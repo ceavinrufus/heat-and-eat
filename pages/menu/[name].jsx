@@ -45,7 +45,6 @@ export default function ProductDetails() {
             console.error("Error fetching reviews:", response_reviews.status, response_reviews.statusText);
           }
           const data_reviews = await response_reviews.json();
-          console.log(data_reviews)
           setReviews(data_reviews["reviews"]);
         }
       } catch (error) {

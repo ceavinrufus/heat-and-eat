@@ -9,7 +9,6 @@ interface CheckoutBarProps {
 
 function CheckoutBar({ item_id, name, price, calorie }: CheckoutBarProps) {
   const [value, setValue] = useState(1);
-  const [cart, setCart] = useState([]);
 
   const handleIncrement = () => {
     const newValue = Math.min(value + 1, 100);
@@ -89,9 +88,9 @@ function CheckoutBar({ item_id, name, price, calorie }: CheckoutBarProps) {
       <button className="flex items-center justify-between w-3/5 bg-[#991E23] px-4 py-2 rounded-full text-white" onClick={handleAddToCart}>
         <div className="">
           <p className="text-xs">Add to cart</p>
-          <p className="text-[8px]">{value * calorie} cal</p>
+          <p className="text-[8px]">{calorie && (value * calorie)} cal</p>
         </div>
-        <p className="text-xs font-bold">{value * price}</p>
+        <p className="text-xs font-bold">{price && (value * price)}</p>
       </button>
     </div>
   );

@@ -9,6 +9,7 @@ interface Item {
   price: number;
   calorie: number;
   shop_id: string;
+  shop_name: string;
   reviews_id: string[];
   rating: number;
 }
