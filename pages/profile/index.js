@@ -1,6 +1,5 @@
 import Head from "next/head";
 import Header from "../../components/Header";
-import { IoChevronBackOutline } from "react-icons/io5";
 import { IoChevronForwardCircleOutline } from "react-icons/io5";
 import { IoPencil } from "react-icons/io5";
 import Button from "../../components/Button";
@@ -17,10 +16,7 @@ export default function Profile() {
       <main className="">
         <div className="flex justify-center">
           <div className="w-[360px] bg-white h-screen">
-            <Header
-              leftIcon={<IoChevronBackOutline className="text-[#991E23]" />}
-              title={"Profile"}
-            />
+            <Header title={"Profile"} />
             <div className="mx-6">
               <div className=" rounded-3xl border-2 border-black bg-[#F3F2F0] px-4 py-6 mb-4">
                 <div className="flex items-center justify-between mb-4">

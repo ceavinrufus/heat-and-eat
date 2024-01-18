@@ -1,14 +1,12 @@
 import Head from "next/head";
-import { FaUserLarge } from "react-icons/fa6";
 import { IoIosSearch } from "react-icons/io";
-import { IoNotifications } from "react-icons/io5";
-import HeaPayPill from "../../components/HeaPayPill";
 import MenuCard from "../../components/MenuCard";
-import React, { useRef, useState } from "react";
+import React from "react";
 import Navbar from "../../components/Navbar";
 import { GiSettingsKnobs } from "react-icons/gi";
+import Link from "next/link";
 
-export default function Home() {
+export default function Menu() {
   return (
     <div className="">
       <Head>
@@ -35,14 +33,16 @@ export default function Home() {
             </div>
             <div className="mb-6 flex justify-center w-full">
               <div className="grid grid-cols-2 gap-3">
-                <MenuCard width="148px" />
-                <MenuCard width="148px" />
-                <MenuCard width="148px" />
-                <MenuCard width="148px" />
-                <MenuCard width="148px" />
-                <MenuCard width="148px" />
-                <MenuCard width="148px" />
-                <MenuCard width="148px" />
+                <Link href={`/menu/salmon-with-fried-rice`}>
+                  <MenuCard size="big" />
+                </Link>
+                <MenuCard size="big" />
+                <MenuCard size="big" />
+                <MenuCard size="big" />
+                <MenuCard size="big" />
+                <MenuCard size="big" />
+                <MenuCard size="big" />
+                <MenuCard size="big" />
               </div>
             </div>
             <div className="sticky bottom-0 w-full z-10">
