@@ -1,12 +1,36 @@
 import Head from "next/head";
 import { IoIosSearch } from "react-icons/io";
 import MenuCard from "../../components/MenuCard";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import { GiSettingsKnobs } from "react-icons/gi";
 import Link from "next/link";
 
 export default function Menu() {
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/items`, {
+          method: "GET",
+          headers: JSON.parse(process.env.NEXT_PUBLIC_HEADER),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setItems(data);
+        } else {
+          console.error("Error fetching items:", response.status, response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching items:", error);
+      }
+    };
+
+    fetchItems();
+  }, []);
+
   return (
     <div className="">
       <Head>
@@ -33,16 +57,11 @@ export default function Menu() {
             </div>
             <div className="mb-6 flex justify-center w-full">
               <div className="grid grid-cols-2 gap-3">
-                <Link href={`/menu/salmon-with-fried-rice`}>
-                  <MenuCard size="big" />
-                </Link>
-                <MenuCard size="big" />
-                <MenuCard size="big" />
-                <MenuCard size="big" />
-                <MenuCard size="big" />
-                <MenuCard size="big" />
-                <MenuCard size="big" />
-                <MenuCard size="big" />
+                {items.map((item, index) => (
+                  <Link key={index} href={`/menu/${item.id}`}>
+                    <MenuCard size="big" item={item}/>
+                  </Link>
+                ))}
               </div>
             </div>
             <div className="sticky bottom-0 w-full z-10">

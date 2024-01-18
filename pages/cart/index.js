@@ -17,13 +17,16 @@ export default function Cart() {
       <main className="">
         <div className="flex justify-center">
           <div className="w-[360px] bg-white h-screen relative">
-            <Header title={"Cart"} />
+            <Header
+              backPath="/"
+              title={"Cart"}
+            />
             <div className="divide-y-[1px] divide-black">
               <div className="px-6 pb-2">
                 <div className="flex gap-2">
                   <FaMapMarkerAlt className="text-[#991E23] text-2xl" />
                   <div className="mt-1">
-                    <p className="text-xs">Delvery Address</p>
+                    <p className="text-xs">Delivery Address</p>
                     <div className="flex gap-2 items-start">
                       <p className="text-xs mt-1">
                         Dastin | (+62) 8123456789 Jl. Old Water Lake No. 11,

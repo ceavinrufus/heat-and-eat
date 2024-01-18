@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Header from "../../components/Header";
 import { FaShoppingCart } from "react-icons/fa";
@@ -8,6 +9,52 @@ import CheckoutBar from "../../components/CheckoutBar";
 export default function ProductDetails() {
   const router = useRouter();
   const { name } = router.query;
+  const [item, setItem] = useState({});
+  const [shop, setShop] = useState({});
+  const [reviews, setReviews] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response_item = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/items/${router.query.name}`, {
+          method: "GET",
+          headers: JSON.parse(process.env.NEXT_PUBLIC_HEADER),
+        });
+        if (!response_item.ok) {
+          console.error("Error fetching item:", response_item.status, response_item.statusText);
+        }
+        const data_item = await response_item.json();
+        setItem(data_item);
+
+        if (data_item.shop_id) {
+          const response_shop = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/shops/${data_item.shop_id}`, {
+            method: "GET",
+            headers: JSON.parse(process.env.NEXT_PUBLIC_HEADER),
+          });
+          if (!response_shop.ok) {
+            console.error("Error fetching shop:", response_shop.status, response_shop.statusText);
+          }
+          const data_shop = await response_shop.json();
+          setShop(data_shop);
+
+          const response_reviews = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/items/${router.query.name}/reviews`, {
+            method: "GET",
+            headers: JSON.parse(process.env.NEXT_PUBLIC_HEADER),
+          });
+          if (!response_reviews.ok) {
+            console.error("Error fetching reviews:", response_reviews.status, response_reviews.statusText);
+          }
+          const data_reviews = await response_reviews.json();
+          console.log(data_reviews)
+          setReviews(data_reviews["reviews"]);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="">
@@ -22,35 +69,30 @@ export default function ProductDetails() {
           <div className="w-[360px] bg-white h-screen relative">
             <Header
               className="text-[#991E23]"
+              backPath="/menu"
               title={"Product Details"}
+              rightIconPath="/cart"
               rightIcon={<FaShoppingCart />}
             />
             <div className="flex flex-col items-center">
               <div className="w-[320px]">
-                <img src="/salman.png" className="w-full" alt="" />
+                <img src={item.image_id && process.env.NEXT_PUBLIC_BACKEND_URL + "/images/" + item?.image_id} className="w-full" alt="" />
                 <div className="mt-4 divide-y-2 divide-solid divide-black space-y-4">
                   <div className="flex flex-col gap-2">
-                    <h2 className="capitalize font-bold">
-                      {name && name.replace(/-/g, " ")}
-                    </h2>
-                    <p className="text-xs">
-                      Nikmatnya sajian Salmon with Fried Rice menggoda selera
-                      dengan kombinasi salmon panggang yang lembut dan nasi
-                      goreng yang gurih. Setiap gigitan memanjakan lidah dengan
-                      perpaduan cita rasa yang sempurna.
-                    </p>
+                    <h2 className="capitalize font-bold">{item?.name}</h2>
+                    <p className="text-xs">{item?.description}</p>
                     <div className="flex items-center justify-between">
-                      <p className="font-bold">Rp50.000</p>
-                      <p>300 kcal</p>
+                      <p className="font-bold">{item?.price}</p>
+                      <p>{item?.calorie} cal</p>
                     </div>
                   </div>
                   <div className="pt-4 flex items-center justify-between">
                     <div className="">
-                      <p className="text-sm font-bold">Toko Suka Majumundur</p>
-                      <p className="text-xs">Kota Bandung</p>
+                      <p className="text-sm font-bold">{shop.name}</p>
+                      <p className="text-xs">{shop.city}</p>
                     </div>
                     <button className="border-[#991E23] text-[#991E23] font-bold border-2 px-3 py-[2px] rounded-md flex">
-                      <a className="text-[10px]" href="">
+                      <a className="text-[10px]">
                         Visit Store
                       </a>
                     </button>
@@ -58,7 +100,9 @@ export default function ProductDetails() {
                   <div className="pt-4">
                     <h2 className="font-bold">Reviews</h2>
                     <div className="mt-2">
-                      <ReviewCard />
+                      {reviews.length > 0 && reviews.map((review, index) => (
+                        <ReviewCard key={index} review={review} />
+                      ))}
                     </div>
                   </div>
                 </div>

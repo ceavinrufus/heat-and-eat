@@ -38,7 +38,7 @@ function CheckoutBar() {
           >
             -
           </button>
-          <input className="w-full text-center" type="number" value={value} />
+          <input className="w-full text-center" type="number" value={value} readOnly/>
           <button
             style={buttonStyle}
             onClick={handleIncrement}

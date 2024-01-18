@@ -16,7 +16,10 @@ export default function Profile() {
       <main className="">
         <div className="flex justify-center">
           <div className="w-[360px] bg-white h-screen">
-            <Header title={"Profile"} />
+            <Header
+            backPath="/"
+            title={"Profile"}
+            />
             <div className="mx-6">
               <div className=" rounded-3xl border-2 border-black bg-[#F3F2F0] px-4 py-6 mb-4">
                 <div className="flex items-center justify-between mb-4">
@@ -28,9 +31,9 @@ export default function Profile() {
                       <p className="text-xs">20 years old</p>
                     </div>
                   </div>
-                  <button className="">
+                  <a href="/profile/edit">
                     <IoPencil />
-                  </button>
+                  </a>
                 </div>
                 <div className="flex justify-between">
                   <h4 className="font-bold">Current Weight</h4>

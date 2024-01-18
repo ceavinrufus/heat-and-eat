@@ -16,6 +16,7 @@ export default function EditProfile() {
         <div className="flex justify-center">
           <div className="w-[360px] bg-white h-screen">
             <Header
+              backPath="/profile"
               leftIcon={<IoChevronBackOutline className="text-[#991E23]" />}
               title={"Edit Profile"}
             />

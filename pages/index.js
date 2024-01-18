@@ -11,8 +11,33 @@ import "swiper/css";
 import "swiper/css/scrollbar";
 
 import { Scrollbar } from "swiper/modules";
+import { useState, useEffect } from "react";
 
 export default function Home() {
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/items`, {
+          method: "GET",
+          headers: JSON.parse(process.env.NEXT_PUBLIC_HEADER),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setItems(data);
+        } else {
+          console.error("Error fetching items:", response.status, response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching items:", error);
+      }
+    };
+
+    fetchItems();
+  }, []);
+
   return (
     <div className="">
       <Head>
@@ -36,9 +61,11 @@ export default function Home() {
               <div className=" rounded-full p-[8px] bg-white text-[#991E23]">
                 <IoNotifications className="text-base" />
               </div>
-              <div className=" rounded-full p-[8px] bg-white text-[#991E23]">
-                <FaUserLarge className="text-base" />
-              </div>
+              <a href="/profile">
+                <div className=" rounded-full p-[8px] bg-white text-[#991E23]">
+                  <FaUserLarge className="text-base" />
+                </div>
+              </a>
             </div>
             <div className="">
               <img src="/Poster.png" className="" alt="" />
@@ -56,15 +83,11 @@ export default function Home() {
                 modules={[Scrollbar]}
                 className="mySwiper"
               >
-                <SwiperSlide>
-                  <MenuCard />
-                </SwiperSlide>
-                <SwiperSlide>
-                  <MenuCard />
-                </SwiperSlide>
-                <SwiperSlide>
-                  <MenuCard />
-                </SwiperSlide>
+                {items.map((item, index) => (
+                  <SwiperSlide key={index}>
+                    <MenuCard item={item} />
+                  </SwiperSlide>
+                ))}
               </Swiper>
             </div>
             <div className="mx-7 mb-6">
@@ -77,15 +100,11 @@ export default function Home() {
                 modules={[Scrollbar]}
                 className="mySwiper"
               >
-                <SwiperSlide>
-                  <MenuCard />
-                </SwiperSlide>
-                <SwiperSlide>
-                  <MenuCard />
-                </SwiperSlide>
-                <SwiperSlide>
-                  <MenuCard />
-                </SwiperSlide>
+                {items.map((item, index) => (
+                  <SwiperSlide key={index}>
+                    <MenuCard item={item} />
+                  </SwiperSlide>
+                ))}
               </Swiper>
             </div>
             <div className="sticky bottom-0 w-full z-10">
